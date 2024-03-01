@@ -123,3 +123,65 @@ export const logIn = async (req, res) => {
 export const forgotPassword = async () => {
     
 }
+//reset password
+export const resetPassword = async (req, res) => {
+    try {
+        const { email, oldpassword, newpassword, confirmpassword } = req.body;
+
+        if (!validator.isEmail(email)) {
+            return res.status(400).json({
+                success: false,
+                message: "Your email format is not correct"
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "User not found for the provided email"
+            });
+        }
+
+        if (!await bcrypt.compare(oldpassword, user.password)) {
+            return res.status(400).json({
+                success: false,
+                message: "Your old password is incorrect"
+            });
+        }
+
+        if (newpassword !== confirmpassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Your confirm password is not the same as the new password"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newpassword, 10);
+
+        const updatePass = await User.findOneAndUpdate(
+            { email },
+            { password: hashedPassword },
+            { new: true }
+        );
+
+        if (!updatePass) {
+            return res.status(500).json({
+                success: false,
+                message: "Error updating password"
+            });
+        }
+
+        return res.status(200).json({
+            message: "Password changed successfully",
+            success: true
+        });
+    } catch (error) {
+        console.error("Reset password error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};

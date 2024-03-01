@@ -25,6 +25,9 @@ app.use("/v1/api/sign-up",(req,res)=>{
 app.use("/v1/api/log-in",(req,res)=>{
     res.send("Bhanu don")
 })
+// app.use("/v1/api/change-password",(req,res)=>{
+//     res.send("Bhanu don")
+// })
 
 app.listen(Port,()=>{
     console.log(`app is listening on post${Port}`)
