@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv'
 import  connectToDb  from './src/db/index.js'
 import userRouter from './src/routes/index.js'
+import { mailSender } from './src/utils/mailSender.js'
 
 const app = express();
 
@@ -18,6 +19,9 @@ app.use(express.json())
 const Port = process.env.PORT;
 connectToDb()
 app.use('/v1/api',userRouter)
+
+
+// mailSender("snghneha8@gmail.com","Hello From udhari.com")
 
 app.use("/v1/api/sign-up",(req,res)=>{
     res.send("Bhanu don")

@@ -1,8 +1,10 @@
 import validator from "validator";
-import { serialize } from 'cookie';
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { User } from "../models/user.model.js";
+import { v4 as uuidv4 } from "uuid";
+import { mailSender } from "../utils/mailSender.js";
+
 
 // sign-up
 export const signUp = async (req, res) => {
@@ -120,9 +122,93 @@ export const logIn = async (req, res) => {
 
 
 //forgot password
-export const forgotPassword = async () => {
-    
-}
+export const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "Email is not correct"
+            });
+        }
+
+        const token = uuidv4();
+        console.log(token); // Corrected: Use 'token' instead of 'randomUuid'
+
+        await User.findOneAndUpdate(
+            { email },
+            { token: token },
+            { new: true }
+        );
+
+        mailSender(email,`http://localhost:3000/forgot-password/${token}`);
+
+        return res.status(200).json({
+            message: "URL is sent to your email",
+            success: true,
+            token
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Something went wrong, please try again later",
+            success: false
+        });
+    }
+};
+
+export const updatePassword = async (req, res) => {
+    try {
+        const { email, newpassword, oldpassword, token } = req.body;
+        
+        if (!email || !newpassword || !oldpassword || !token) {
+            return res.status(400).json({
+                success: false,
+                message: "Input fields should not be empty"
+            });
+        }
+
+        if (newpassword !== oldpassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Both passwords should be the same"
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user || user.token !== token) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid email or token"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newpassword, 10);
+
+        const updatedUser = await User.findOneAndUpdate(
+            { email },
+            { password: hashedPassword },
+            { new: true }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Password changed successfully",
+            updatedUser
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message,
+            success: false
+        });
+    }
+};
+
+
 //reset password
 export const resetPassword = async (req, res) => {
     try {
