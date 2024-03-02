@@ -131,7 +131,7 @@ export const forgotPassword = async (req, res) => {
         if (!user) {
             return res.status(400).json({
                 success: false,
-                message: "Email is not correct"
+                message: "user not found"
             });
         }
 
@@ -161,16 +161,16 @@ export const forgotPassword = async (req, res) => {
 
 export const updatePassword = async (req, res) => {
     try {
-        const { email, newpassword, oldpassword, token } = req.body;
+        const { email, newpassword, confirmpassword, token } = req.body;
         
-        if (!email || !newpassword || !oldpassword || !token) {
+        if (!email || !newpassword || !confirmpassword || !token) {
             return res.status(400).json({
                 success: false,
                 message: "Input fields should not be empty"
             });
         }
 
-        if (newpassword !== oldpassword) {
+        if (newpassword !== confirmpassword) {
             return res.status(400).json({
                 success: false,
                 message: "Both passwords should be the same"
