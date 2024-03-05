@@ -1,4 +1,5 @@
-import { Customer } from "../models/customer.model.js";
+// import { Customer } from "../models/customer.model.js";
+import {Customer} from "../models/customer.model.js"
 import { TotalCustomerTransaction } from "../models/customerReports.model.js";
 import { getRelativeTime } from "../utils/getRelativeTime.js";
 
@@ -9,9 +10,7 @@ export const createCustomer = async (req, res) => {
         customerName,
         number,
         description,
-        reminder,
         money,
-        reminderDescription,
         transactionType,
       } = req.body;
   
@@ -29,8 +28,6 @@ export const createCustomer = async (req, res) => {
         number,
         money,
         description,
-        reminder,
-        reminderDescription,
         transactionType,
       });
   
@@ -79,7 +76,9 @@ export const getAllTransactions = async (req, res) => {
       transaction.totalCustomerTransactions.map((customer) => {
         const transactionDetails = {
           name: customer.customerName,
+          id:customer._id,
           date: getRelativeTime(customer.createdAt),
+          sortingDate:customer.createdAt,
           money: customer.money,
           transactionType: customer.transactionType,
         };
@@ -110,6 +109,27 @@ export const getAllTransactions = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching all customer transactions',
+      error: error.message,
+    });
+  }
+};
+
+export const getCustomerInfo = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    // Add the 'await' keyword to resolve the promise returned by findById
+    const user = await Customer.findById(id);
+
+    return res.json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching customer information',
       error: error.message,
     });
   }

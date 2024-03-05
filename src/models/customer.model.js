@@ -12,12 +12,6 @@ const customerSchema = new Schema(
     description: {
       type: String,
     },
-    reminder: {
-      type: Date,
-    },
-    reminderDescription: {
-      type: String,
-    },
     money:{
       type:Number,
       required:[true,"money is required"]
