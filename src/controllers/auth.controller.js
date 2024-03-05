@@ -58,7 +58,7 @@ export const signUp = async (req, res) => {
         const token = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, { expiresIn: "5h" });
 
         res.cookie('token', token, {
-            maxAge: 5 * 60 * 60 * 1000,
+            maxAge: 15 * 24 * 60 * 60 * 1000,
             httpOnly: true,
         });
 
@@ -101,7 +101,7 @@ export const logIn = async (req, res) => {
         const token = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, { expiresIn: "5h" });
 
         res.cookie('token', token, {
-            maxAge: 5 * 60 * 60 * 1000,
+            maxAge: 15 * 24 * 60 * 60 * 1000,
             httpOnly: true,
         });
 
@@ -158,6 +158,7 @@ export const forgotPassword = async (req, res) => {
         });
     }
 };
+
 
 export const updatePassword = async (req, res) => {
     try {
