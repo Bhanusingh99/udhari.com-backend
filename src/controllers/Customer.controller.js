@@ -197,6 +197,18 @@ export const getSelectedCustomerHistory = async (req, res) => {
       return transactionDetails;
     });
 
+    // if (totalCredit > 0) {
+    //   await Customer.findByIdAndUpdate(
+    //     id,
+    //     { 
+    //       $inc: { money: totalCredit }, // Increment money by totalCredit
+    //       $set: { transactionType: "CREDIT" } // Set transactionType to "CREDIT"
+    //     },
+    //     { new: true }
+    //   );
+    // }
+    
+
     res.status(200).json({
       success: true,
       data: {
