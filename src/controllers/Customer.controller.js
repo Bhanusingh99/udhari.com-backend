@@ -95,9 +95,9 @@ export const getAllTransactions = async (req, res) => {
     const customerDetails = transactions.map((transaction) =>
       transaction.totalCustomerTransactions.map((customer) => {
         const transactionDetails = {
-          name: customer.customerName,
+          customerName: customer.customerName,
           id:customer._id,
-          date: getRelativeTime(customer.createdAt),
+          createdAt: getRelativeTime(customer.createdAt),
           sortingDate:customer.createdAt,
           money: customer.money,
           transactionType: customer.transactionType,
@@ -267,6 +267,41 @@ export const addNewCustomerEntry = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error adding new entry',
+      error: error.message,
+    });
+  }
+};
+
+export const searchApi = async (req, res) => {
+  const query = req.params.query;
+
+  try {
+    const results = await Customer.find({
+      customerName: { $regex: query, $options: 'i' },
+    });
+
+    const customerDetails = results.map((customer) => {
+      const transactionDetails = {
+        customerName: customer.customerName,
+        id: customer._id,
+        createdAt: getRelativeTime(customer.createdAt), // or another timestamp property
+        sortingDate: customer.createdAt,
+        money: customer.money,
+        transactionType: customer.transactionType,
+      };
+
+      return transactionDetails;
+    });
+
+    res.json({
+      success: true,
+      data: customerDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
       error: error.message,
     });
   }

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { forgotPassword, logIn, resetPassword, signUp, updatePassword } from "../controllers/auth.controller.js";
-import { addNewCustomerEntry, createCustomer, getAllTransactions, getCustomerInfo, getSelectedCustomerHistory } from "../controllers/Customer.controller.js";
+import { addNewCustomerEntry, createCustomer, getAllTransactions, getCustomerInfo, getSelectedCustomerHistory, searchApi } from "../controllers/Customer.controller.js";
 
 const userRouter = Router();
 
@@ -14,6 +14,7 @@ userRouter.get('/total-customers-transactions',getAllTransactions);
 userRouter.post("/get-user-info",getCustomerInfo);
 userRouter.post("/get-selected-customer-history",getSelectedCustomerHistory);
 userRouter.post("/add-customer-history",addNewCustomerEntry);
+userRouter.get("/search/:query",searchApi);
 
 
 
