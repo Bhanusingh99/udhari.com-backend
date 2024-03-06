@@ -1,7 +1,7 @@
 // import { Customer } from "../models/customer.model.js";
 import {Customer} from "../models/customer.model.js"
 import { TotalCustomerTransaction } from "../models/customerReports.model.js";
-import { selectedCustomerHistory } from "../models/selectedCustomeHistory.model.js";
+import { customerHistory } from "../models/customerTransactionHistory.model.js";
 import { getRelativeTime } from "../utils/getRelativeTime.js";
 
 // Controller for creating a new customer and adding a transaction to totalCustomerTransactions
@@ -42,20 +42,29 @@ export const createCustomer = async (req, res) => {
     await TotalCustomerTransaction.findOneAndUpdate(
       {},
       { $push: { totalCustomerTransactions: savedCustomer._id } },
-      { upsert: true }
+      { upsert: true, new:true }
     );
 
-    // Update selectedCustomerHistory document
-    await selectedCustomerHistory.findOneAndUpdate(
+    // Update or create CustomerTrasactionHistory document for the customer
+    const customerHistoryRecord = await customerHistory.findOneAndUpdate(
       { customerId: savedCustomer._id },
-      { $push: { transactionHistory: savedCustomer._id } },
-      { upsert: true }
+      {
+        $push: {
+          totalTrasaction: {
+            money,
+            description,
+            transactionType,
+          },
+        },
+      },
+      { upsert: true, new: true }
     );
 
     res.status(201).json({
       success: true,
       message: 'Customer created successfully',
       data: savedCustomer,
+      transactionHistory: customerHistoryRecord,
     });
   } catch (error) {
     console.error(error);
@@ -66,7 +75,6 @@ export const createCustomer = async (req, res) => {
     });
   }
 };
-
 
 
 // Controller for fetching all totalCustomerTransactions sorted by timestamp
@@ -157,51 +165,96 @@ export const getSelectedCustomerHistory = async (req, res) => {
       });
     }
 
-    const transactions = await selectedCustomerHistory
+    const transactions = await customerHistory
       .findOne({ customerId: id })
       .populate({
-        path: 'transactionHistory',
-        select: 'customerName createdAt number description transactionType money',
+        path: 'totalTrasaction',
+        select: 'createdAt description transactionType money',
       })
       .sort({ createdAt: -1 })
       .exec();
 
+    // Calculate totalCash and totalCredit
+    let totalCash = 0;
+    let totalCredit = 0;
+
     // Extract customer details and calculate totalCash and totalCredit
-    // const customerDetails = transactions.map((transaction) =>
-    //   transaction.totalCustomerTransactions.map((customer) => {
-    //     const transactionDetails = {
-    //       name: customer.customerName,
-    //       id:customer._id,
-    //       date: getRelativeTime(customer.createdAt),
-    //       sortingDate:customer.createdAt,
-    //       money: customer.money,
-    //       transactionType: customer.transactionType,
-    //     };
+    const customerDetails = transactions.totalTrasaction.map((transaction) => {
+      const transactionDetails = {
+        money: transaction.money,
+        description: transaction.description,
+        transactionType: transaction.transactionType,
+        _id: transaction._id,
+        createdAt: transaction.createdAt,
+      };
 
-    //     if (customer.transactionType === 'CASH') {
-    //       totalCash += customer.money;
-    //     } else if (customer.transactionType === 'CREDIT') {
-    //       totalCredit += customer.money;
-    //     }
+      if (transaction.transactionType === 'CASH') {
+        totalCash += transaction.money;
+      } else if (transaction.transactionType === 'CREDIT') {
+        totalCredit += transaction.money;
+      }
 
-    //     return transactionDetails;
-    //   })
-    // );
-
-    // Flatten the array of customer details
-    // const allCustomerDetails = [].concat(...customerDetails);
+      return transactionDetails;
+    });
 
     res.status(200).json({
       success: true,
       data: {
-        transactions
+        transactions: customerDetails,
+        totalCash,
+        totalCredit,
       },
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Error fetching all customer transactions',
+      message: 'Error fetching customer transactions',
+      error: error.message,
+    });
+  }
+};
+
+
+export const addNewCustomerEntry = async (req, res) => {
+  try {
+    const { money, description, transactionType, customerId } = req.body;
+
+    // Find the customer by ID
+    const customer = await Customer.findById(customerId);
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: 'Customer not found',
+      });
+    }
+
+    // Find or create the CustomerTrasactionHistory document for the customer
+    const historyEntry = await customerHistory.findOneAndUpdate(
+      { customerId },
+      {
+        $push: {
+          totalTrasaction: {
+            money,
+            description,
+            transactionType,
+          },
+        },
+      },
+      { upsert: true, new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'New entry added successfully',
+      data: historyEntry,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Error adding new entry',
       error: error.message,
     });
   }
