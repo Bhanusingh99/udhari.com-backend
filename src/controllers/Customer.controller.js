@@ -100,6 +100,7 @@ export const getAllTransactions = async (req, res) => {
           createdAt: getRelativeTime(customer.createdAt),
           sortingDate:customer.createdAt,
           money: customer.money,
+          description:customer.description,
           transactionType: customer.transactionType,
         };
 

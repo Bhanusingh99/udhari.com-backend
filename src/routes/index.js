@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { forgotPassword, logIn, resetPassword, signUp, updatePassword } from "../controllers/auth.controller.js";
 import { addNewCustomerEntry, createCustomer, getAllTransactions, getCustomerInfo, getSelectedCustomerHistory, searchApi } from "../controllers/Customer.controller.js";
+import { generatePdf } from "../controllers/generatePdf.controller.js";
 
 const userRouter = Router();
 
@@ -15,6 +16,7 @@ userRouter.post("/get-user-info",getCustomerInfo);
 userRouter.post("/get-selected-customer-history",getSelectedCustomerHistory);
 userRouter.post("/add-customer-history",addNewCustomerEntry);
 userRouter.get("/search/:query",searchApi);
+userRouter.post("/generate-invoice",generatePdf)
 
 
 

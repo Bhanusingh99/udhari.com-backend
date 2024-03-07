@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 import  connectToDb  from './src/db/index.js'
 import userRouter from './src/routes/index.js'
 import { mailSender } from './src/utils/mailSender.js'
+import { generateInvoice } from './src/utils/generatePdf.js'
 
 const app = express();
 
@@ -29,9 +30,6 @@ app.use("/v1/api/sign-up",(req,res)=>{
 app.use("/v1/api/log-in",(req,res)=>{
     res.send("Bhanu don")
 })
-// app.use("/v1/api/change-password",(req,res)=>{
-//     res.send("Bhanu don")
-// })
 
 app.listen(Port,()=>{
     console.log(`app is listening on post${Port}`)
