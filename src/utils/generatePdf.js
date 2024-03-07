@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import PDFDocument from 'pdfkit';
+import { getRelativeTime } from './getRelativeTime.js';
 
 export const generateInvoice = async (invoiceData, outputPath = 'public/invoice.pdf') => {
   try {
@@ -20,7 +21,7 @@ export const generateInvoice = async (invoiceData, outputPath = 'public/invoice.
       ;
       doc.moveDown();
       doc.text(`Invoice Number: ${invoiceData.invoiceData.name}`);
-      doc.text(`Date: ${invoiceData.invoiceData.date}`);
+      doc.text(`Date: ${getRelativeTime(Date.now())}`);
       doc.moveDown();
       doc.text(`company Info:{ 
           company name: ${invoiceData.invoiceData.companyInfo.companyName},

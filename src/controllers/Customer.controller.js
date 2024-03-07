@@ -76,7 +76,6 @@ export const createCustomer = async (req, res) => {
   }
 };
 
-
 // Controller for fetching all totalCustomerTransactions sorted by timestamp
 export const getAllTransactions = async (req, res) => {
   try {
