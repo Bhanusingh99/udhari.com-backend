@@ -39,7 +39,6 @@ export const generateInvoice = async (invoiceData, outputPath = 'public/invoice.
         Transaction Mode: ${invoiceData.invoiceData.UserInfo.TransactionMode},
     }`)
 
-      // Add more details as needed
 
       // Save the document
       doc.end();

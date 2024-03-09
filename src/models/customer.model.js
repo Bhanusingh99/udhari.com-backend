@@ -16,6 +16,10 @@ const customerSchema = new Schema(
       type:Number,
       required:[true,"money is required"]
     },
+    bgColor:{
+      type:String,
+      required:true
+    },
     transactionType: {
       type: String,
       enum: ["CASH", "CREDIT"],

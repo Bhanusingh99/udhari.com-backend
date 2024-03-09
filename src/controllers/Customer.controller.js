@@ -2,6 +2,7 @@
 import {Customer} from "../models/customer.model.js"
 import { TotalCustomerTransaction } from "../models/customerReports.model.js";
 import { customerHistory } from "../models/customerTransactionHistory.model.js";
+import { getRandomColor } from "../utils/getRandomColor.js";
 import { getRelativeTime } from "../utils/getRelativeTime.js";
 
 // Controller for creating a new customer and adding a transaction to totalCustomerTransactions
@@ -26,6 +27,7 @@ export const createCustomer = async (req, res) => {
       });
     }
 
+    const bgColor = getRandomColor();
     // Create a new customer
     const newCustomer = new Customer({
       customerName,
@@ -33,6 +35,7 @@ export const createCustomer = async (req, res) => {
       money,
       description,
       transactionType,
+      bgColor
     });
 
     // Save the new customer
@@ -82,7 +85,7 @@ export const getAllTransactions = async (req, res) => {
     const transactions = await TotalCustomerTransaction.find()
       .populate({
         path: 'totalCustomerTransactions',
-        select: 'customerName createdAt number description transactionType money',
+        select: 'customerName bgColor createdAt number description transactionType money',
       })
       .sort({ createdAt: -1 })
       .exec();
@@ -99,6 +102,7 @@ export const getAllTransactions = async (req, res) => {
           createdAt: getRelativeTime(customer.createdAt),
           sortingDate:customer.createdAt,
           money: customer.money,
+          bgColor:customer.bgColor,
           description:customer.description,
           transactionType: customer.transactionType,
         };
