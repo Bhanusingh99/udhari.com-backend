@@ -279,11 +279,14 @@ export const addNewCustomerEntry = async (req, res) => {
 export const searchApi = async (req, res) => {
   const query = req.params.query;
 
-  try {
-    const results = await Customer.find({
-      customerName: { $regex: query, $options: 'i' },
-    });
+  let results; // Declare results variable outside the if-else blocks
 
+  try {
+   
+      results = await Customer.find({
+        customerName: { $regex: query, $options: 'i' },
+      });
+  
     const customerDetails = results.map((customer) => {
       const transactionDetails = {
         customerName: customer.customerName,
