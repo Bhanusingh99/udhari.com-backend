@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { urlencoded } from 'express'
 import cors from "cors"
 import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv'
@@ -6,6 +6,7 @@ import  connectToDb  from './src/db/index.js'
 import userRouter from './src/routes/index.js'
 import { mailSender } from './src/utils/mailSender.js'
 import { generateInvoice } from './src/utils/generatePdf.js'
+import cloudinary from './src/utils/cloudinary.js'
 
 const app = express();
 
@@ -15,7 +16,15 @@ app.use(cors({
     credentials: true 
   }));
 app.use(cookieParser());
-app.use(express.json())
+app.use(express.json({
+    limit:"2mb"
+}));
+app.use(express.urlencoded({
+    extended:true,
+    limit:"2mb"
+}))
+
+
 
 const Port = process.env.PORT;
 connectToDb()
