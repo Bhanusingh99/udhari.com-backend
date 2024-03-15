@@ -55,7 +55,7 @@ export const signUp = async (req, res) => {
             email: createUser.email
         }
 
-        const token = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, { expiresIn: "5h" });
+        const token = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, { expiresIn: "15d" });
 
         res.cookie('token', token, {
             maxAge: 15 * 24 * 60 * 60 * 1000,
@@ -98,7 +98,7 @@ export const logIn = async (req, res) => {
             email: user.email,
         };
 
-        const token = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, { expiresIn: "5h" });
+        const token = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, { expiresIn: "15d" });
 
         res.cookie('token', token, {
             maxAge: 15 * 24 * 60 * 60 * 1000,
