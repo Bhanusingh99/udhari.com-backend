@@ -32,6 +32,9 @@ const itemSchema = new Schema({
     image:{
         type:String,
         required:[true,"image is required"]
+    },
+    userId:{
+        type:String
     }
 })
 

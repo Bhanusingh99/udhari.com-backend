@@ -25,6 +25,9 @@ const customerSchema = new Schema(
       enum: ["CASH", "CREDIT"],
       required: [true, "Transaction type is required"],
     },
+    userId:{
+      type:String
+    }
   },
   { timestamps: true }
 );

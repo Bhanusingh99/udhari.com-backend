@@ -2,7 +2,7 @@ import { Item } from "../models/item.model.js";
 
 export const createItem = async(req,res) => {
     try {
-        const{title,description,tag,totalWeight,originalPrice,discount,image} = req.body;
+        const{title,description,tag,totalWeight,originalPrice,discount,image,userId} = req.body;
 
         if(!title||!description||!tag||!totalWeight||!originalPrice||!discount||!image){
             return res.status(400).json({
@@ -18,7 +18,8 @@ export const createItem = async(req,res) => {
           originalPrice,
           discount,
           image,
-          totalWeight
+          totalWeight,
+          userId
         })
 
         return res.status(200).json({
@@ -48,3 +49,25 @@ export const getTotalItems = async (req, res) => {
     });
   }
 };
+
+
+export const getIndividualItems = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const foundItem = await Item.find( userId );
+
+    return res.status(200).json({
+      success: true,
+      message: "Every item fetched",
+      res: foundItem,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching items",
+      error: error.message,
+    });
+  }
+}

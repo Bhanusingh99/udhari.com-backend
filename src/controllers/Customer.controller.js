@@ -8,7 +8,7 @@ import { getRelativeTime } from "../utils/getRelativeTime.js";
 // Controller for creating a new customer and adding a transaction to totalCustomerTransactions
 export const createCustomer = async (req, res) => {
   try {
-    const { customerName, number, description, money, transactionType } = req.body;
+    const { customerName, number, description, money, transactionType , userId} = req.body;
 
     // Validate required fields
     if (!customerName || !transactionType || !money) {
@@ -35,7 +35,8 @@ export const createCustomer = async (req, res) => {
       money,
       description,
       transactionType,
-      bgColor
+      bgColor,
+      userId
     });
 
     // Save the new customer
@@ -82,51 +83,15 @@ export const createCustomer = async (req, res) => {
 // Controller for fetching all totalCustomerTransactions sorted by timestamp
 export const getAllTransactions = async (req, res) => {
   try {
-    const transactions = await TotalCustomerTransaction.find()
-      .populate({
-        path: 'totalCustomerTransactions',
-        select: 'customerName bgColor createdAt number description transactionType money',
-      })
-      .sort({ createdAt: -1 })
-      .exec();
+    const {userId} = req.body;
+    console.log(userId)
 
-    let totalCash = 0;
-    let totalCredit = 0;
-
-    // Extract customer details and calculate totalCash and totalCredit
-    const customerDetails = transactions.map((transaction) =>
-      transaction.totalCustomerTransactions.map((customer) => {
-        const transactionDetails = {
-          customerName: customer.customerName,
-          id:customer._id,
-          createdAt: getRelativeTime(customer.createdAt),
-          sortingDate:customer.createdAt,
-          money: customer.money,
-          bgColor:customer.bgColor,
-          description:customer.description,
-          transactionType: customer.transactionType,
-        };
-
-        if (customer.transactionType === 'CASH') {
-          totalCash += customer.money;
-        } else if (customer.transactionType === 'CREDIT') {
-          totalCredit += customer.money;
-        }
-
-        return transactionDetails;
-      })
-    );
-
-    // Flatten the array of customer details
-    const allCustomerDetails = [].concat(...customerDetails);
+    const totalCustomer = await Customer.find({userId});
 
     res.status(200).json({
       success: true,
-      data: {
-        transactions: allCustomerDetails,
-        totalCash,
-        totalCredit,
-      },
+      message: 'total custome fetched',
+      totalCustomer
     });
   } catch (error) {
     console.error(error);
@@ -313,3 +278,4 @@ export const searchApi = async (req, res) => {
     });
   }
 };
+
