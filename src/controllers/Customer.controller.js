@@ -84,9 +84,8 @@ export const createCustomer = async (req, res) => {
 export const getAllTransactions = async (req, res) => {
   try {
     const {userId} = req.body;
-    console.log(userId)
 
-    const totalCustomer = await Customer.find({userId});
+    const totalCustomer = await Customer.find({userId}).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,

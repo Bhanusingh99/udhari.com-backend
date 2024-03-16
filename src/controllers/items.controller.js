@@ -55,7 +55,7 @@ export const getIndividualItems = async (req, res) => {
   try {
     const { userId } = req.body;
 
-    const foundItem = await Item.find( userId );
+    const foundItem = await Item.find( {userId} );
 
     return res.status(200).json({
       success: true,
